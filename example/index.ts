@@ -1,6 +1,9 @@
 import '../src/index.css'
 import '../src/index.js'
 
-document.body.innerHTML += `
-    <{{component-name}}></{{component-name}}>
-`
+if (import.meta.env.DEV || import.meta.env.MODE === 'staging') {
+    localStorage.setItem('DEBUG', 'checkbox')
+} else {
+    localStorage.removeItem('DEBUG')
+    localStorage.removeItem('debug')
+}

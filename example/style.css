@@ -1,0 +1,29 @@
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    line-height: 1.6;
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+check-box.disabled {
+    opacity: 0.4;
+
+    & label {
+        cursor: not-allowed;
+    }
+}
+
+h1 {
+    margin-bottom: 1rem;
+    border-bottom: 2px solid;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}

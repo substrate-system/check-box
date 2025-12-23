@@ -1,98 +1,135 @@
-import { createDebug } from '@substrate-system/debug'
-const debug = createDebug()
+import { define } from '@substrate-system/web-component/util'
+import Debug from '@substrate-system/debug'
+const debug = Debug('checkbox')
 
-// for docuement.querySelector
+// for document.querySelector
 declare global {
     interface HTMLElementTagNameMap {
-        '{{component-name}}': Example
+        'check-box':CheckBox
     }
 }
 
-export class Example extends HTMLElement {
-    // Define the attributes to observe
-    // need this for `attributeChangedCallback`
-    static observedAttributes = ['example']
+export class CheckBox extends HTMLElement {
+    static observedAttributes = ['checked', 'disabled', 'name']
 
-    example:string|null
+    private _input:HTMLInputElement|null = null
 
-    constructor () {
-        super()
-        const example = this.getAttribute('example')
-        this.example = example
-
-        this.innerHTML = `<div>
-            <p>example</p>
-            <ul>
-                ${Array.from(this.children).filter(Boolean).map(node => {
-                    return `<li>${node.outerHTML}</li>`
-                }).join('')}
-            </ul>
-        </div>`
+    get checked ():boolean {
+        return this._input?.checked ?? false
     }
 
-    /**
-     * Handle 'example' attribute changes
-     * @see {@link https://gomakethings.com/how-to-detect-when-attributes-change-on-a-web-component/#organizing-your-code Go Make Things article}
-     *
-     * @param  {string} oldValue The old attribute value
-     * @param  {string} newValue The new attribute value
-     */
-    handleChange_example (oldValue:string, newValue:string) {
-        debug('handling example change', oldValue, newValue)
-
-        if (newValue === null) {
-            // [example] was removed
+    set checked (value:boolean) {
+        if (this._input) {
+            this._input.checked = value
+        }
+        if (value) {
+            this.setAttribute('checked', '')
         } else {
-            // set [example] attribute
+            this.removeAttribute('checked')
         }
     }
 
-    /**
-     * Runs when the value of an attribute is changed
-     *
-     * @param  {string} name     The attribute name
-     * @param  {string} oldValue The old attribute value
-     * @param  {string} newValue The new attribute value
-     */
-    attributeChangedCallback (name:string, oldValue:string, newValue:string) {
-        debug('an attribute changed', name)
-        const handler = this[`handleChange_${name}`];
-        (handler && handler(oldValue, newValue))
-        this.render()
+    get disabled ():boolean {
+        return this._input?.disabled ?? false
     }
 
-    disconnectedCallback () {
-        debug('disconnected')
+    set disabled (value:boolean) {
+        if (this._input) {
+            this._input.disabled = value
+        }
+        if (value) {
+            this.setAttribute('disabled', '')
+            this.classList.add('disabled')
+        } else {
+            this.removeAttribute('disabled')
+            this.classList.remove('disabled')
+        }
+    }
+
+    get name ():string {
+        return this._input?.name ?? ''
+    }
+
+    set name (value:string) {
+        if (this._input) {
+            this._input.name = value
+        }
+        this.setAttribute('name', value)
     }
 
     connectedCallback () {
         debug('connected')
-
-        const observer = new MutationObserver(function (mutations) {
-            mutations.forEach((mutation) => {
-                if (mutation.addedNodes.length) {
-                    debug('Node added: ', mutation.addedNodes)
-                }
-            })
-        })
-
-        observer.observe(this, { childList: true })
-
         this.render()
+        this._input = this.querySelector('input')
+        this._input?.addEventListener('change', this.handleChange)
+    }
+
+    disconnectedCallback () {
+        debug('disconnected')
+        this._input?.removeEventListener('change', this.handleChange)
+    }
+
+    attributeChangedCallback (name:string, oldValue:string, newValue:string) {
+        debug('attribute changed', name, oldValue, newValue)
+
+        if (!this._input) return
+
+        switch (name) {
+            case 'checked':
+                this._input.checked = newValue !== null
+                break
+            case 'disabled':
+                this._input.disabled = newValue !== null
+                if (newValue !== null) {
+                    this.classList.add('disabled')
+                } else {
+                    this.classList.remove('disabled')
+                }
+                break
+            case 'name':
+                this._input.name = newValue ?? ''
+                break
+        }
+    }
+
+    private handleChange = (ev:Event) => {
+        const target = ev.target as HTMLInputElement
+        debug('checkbox changed', target.checked)
+
+        // Update the attribute to reflect the new state
+        if (target.checked) {
+            this.setAttribute('checked', '')
+        } else {
+            this.removeAttribute('checked')
+        }
+
+        // Dispatch a custom event
+        this.dispatchEvent(new CustomEvent('change', {
+            bubbles: true,
+            detail: { checked: target.checked }
+        }))
     }
 
     render () {
-        this.innerHTML = `<div>
-            <p>example</p>
-            <ul>
-                ${Array.from(this.children).filter(Boolean).map(node => {
-                    return `<li>${node.outerHTML}</li>`
-                }).join('')}
-            </ul>
-        </div>`
+        const labelText = this.textContent?.trim() || ''
+        const isChecked = this.hasAttribute('checked')
+        const isDisabled = this.hasAttribute('disabled')
+        const name = this.getAttribute('name') || ''
+
+        if (isDisabled) {
+            this.classList.add('disabled')
+        }
+
+        this.innerHTML = `<label class="checkbox-label">
+            <input
+                type="checkbox"
+                ${name ? `name="${name}"` : ''}
+                ${isChecked ? 'checked' : ''}
+                ${isDisabled ? 'disabled' : ''}
+            />
+            <span>${labelText}</span>
+        </label>`
     }
 }
 
-if ('customElements' in window) {
-    customElements.define('{{component-name}}', Example)
-}
+define('check-box', CheckBox)

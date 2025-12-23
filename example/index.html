@@ -3,10 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Example</title>
+    <link rel="stylesheet" href="/style.css">
+    <title>Check Box Example</title>
 </head>
 <body>
-    <{{component-name}}></{{component-name}}>
+    <h1>Check Box</h1>
+
+    <ul>
+        <li>
+            <check-box name="option1">First option</check-box>
+        </li>
+        <li>
+            <check-box name="option2" checked>
+                Second option (checked by default)
+            </check-box>
+        </li>
+        <li>
+            <check-box name="option3" disabled>
+                Disabled option
+            </check-box>
+        </li>
+    </ul>
+
     <script type="module" src="./index.ts"></script>
-  </body>
+</body>
 </html>
