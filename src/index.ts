@@ -1,6 +1,5 @@
+import type Debug from '@substrate-system/debug'
 import { define } from '@substrate-system/web-component/util'
-const Debug = (await import('@substrate-system/debug')).default
-const debug = Debug('checkbox')
 
 // for document.querySelector
 declare global {
@@ -11,8 +10,8 @@ declare global {
 
 export class CheckBox extends HTMLElement {
     static observedAttributes = ['checked', 'disabled', 'name']
-
     private _input:HTMLInputElement|null = null
+    private _debug:ReturnType<typeof Debug>|null = null
 
     get checked ():boolean {
         return this._input?.checked ?? false
@@ -57,8 +56,11 @@ export class CheckBox extends HTMLElement {
         this.setAttribute('name', value)
     }
 
-    connectedCallback () {
+    async connectedCallback () {
         this.render()
+        const Debug = (await import('@substrate-system/debug')).default
+        const debug = Debug('checkbox')
+        this._debug = debug
         this._input = this.querySelector('input')
         this._input?.addEventListener('change', this.handleChange)
     }
@@ -90,7 +92,7 @@ export class CheckBox extends HTMLElement {
 
     private handleChange = (ev:Event) => {
         const target = ev.target as HTMLInputElement
-        debug('checkbox changed', target.checked)
+        this._debug!('checkbox changed', target.checked)
 
         // Update the attribute to reflect the new state
         if (target.checked) {
