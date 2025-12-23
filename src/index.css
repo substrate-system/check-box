@@ -46,10 +46,10 @@ input[type="checkbox"] {
     background-color: #fff;
     margin: 0;
     font: inherit;
-    color: currentColor;
+    color: currentcolor;
     width: 1.15em;
     height: 1.15em;
-    border: 2px solid currentColor;
+    border: 2px solid currentcolor;
     transform: translateY(-0.075em);
     position: relative;
     cursor: pointer;
@@ -92,7 +92,7 @@ input[type="checkbox"] {
     /* Remove focus ring and border change only when clicking with mouse */
     &:focus:not(:focus-visible) {
         outline: none;
-        border-color: currentColor;
+        border-color: currentcolor;
     }
 
     /* Keep focus ring for keyboard navigation */

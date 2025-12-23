@@ -31,8 +31,9 @@
   ],
   "scripts": {
     "lint": "eslint \"./**/*.{ts,js}\"",
+    "stylelint": "stylelint src/*.css",
     "build-tests": "esbuild test/index.ts --target=es2020 --bundle --keep-names > test/test-bundle.js",
-    "test": "esbuild ./test/index.ts | tapout",
+    "test": "esbuild --bundle ./test/index.ts | tapout",
     "build-css": "postcss src/index.css --use postcss-nesting > dist/index.css",
     "build-css:min": "postcss src/index.css --use cssnano postcss-nesting > dist/index.min.css",
     "build-cjs": "esbuild src/*.ts --format=cjs --keep-names --tsconfig=tsconfig.build.json --outdir=./dist --out-extension:.js=.cjs --sourcemap",
